@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CalculatorScreen extends StatelessWidget {
-  const CalculatorScreen({super.key});
+  CalculatorScreen({super.key});
 
   String userInput = "";
   String result = "0";
@@ -31,8 +31,8 @@ class CalculatorScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return scaffold(
-      backgroundColor: color(0xff1d2630),
+    return Scaffold(
+      backgroundColor: Color(0xff1d2630),
       body: Column(
         children: [
           SizedBox(
@@ -71,7 +71,11 @@ class CalculatorScreen extends StatelessWidget {
               padding: EdgeInsets.all(10),
               child: GridView.builder(
                 itemCount: buttonList.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
                 itemBuilder: (BuildContext context, int index) {
                   return CustomButton(buttonList[index]);
                 },
@@ -80,6 +84,14 @@ class CalculatorScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget CustomButton(String Text) {
+    return InkWell(
+      splashColor: Color(0xff1d2630),
+      onTap: (){},
+      child: Ink(),
     );
   }
 }
