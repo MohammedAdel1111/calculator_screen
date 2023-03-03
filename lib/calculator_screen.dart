@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
-class CalculatorScreen extends StatelessWidget {
+class CalculatorScreen extends StatefulWidget {
   CalculatorScreen({super.key});
 
+  @override
+  State<CalculatorScreen> createState() => _CalculatorScreenState();
+}
+
+class _CalculatorScreenState extends State<CalculatorScreen> {
   String userInput = "";
+
   String result = "0";
 
   List<String> buttonList = [
@@ -36,11 +43,11 @@ class CalculatorScreen extends StatelessWidget {
       body: Column(
         children: [
           SizedBox(
-            height: MediaQuery.of(context).size.height / 3,
+            height: 150,
             child: Column(
               children: [
                 Container(
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(22),
                   alignment: Alignment.centerRight,
                   child: Text(
                     userInput,
@@ -51,7 +58,7 @@ class CalculatorScreen extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(5),
                   alignment: Alignment.centerRight,
                   child: Text(
                     result,
@@ -87,11 +94,100 @@ class CalculatorScreen extends StatelessWidget {
     );
   }
 
-  Widget CustomButton(String Text) {
+  Widget CustomButton(String text) {
     return InkWell(
       splashColor: Color(0xff1d2630),
-      onTap: (){},
-      child: Ink(),
+      onTap: () {
+        setState(() {
+          handleButtons(text);
+        });
+      },
+      child: Ink(
+        decoration: BoxDecoration(
+          color: getBgColor(text),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.white.withOpacity(0.1),
+              blurRadius: 4,
+              spreadRadius: 0.5,
+              offset: Offset(-3, -3),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Text(
+            text,
+            style: TextStyle(
+              color: getColor(text),
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
     );
+  }
+
+  getColor(String text) {
+    if (text == '/' ||
+        text == '*' ||
+        text == '+' ||
+        text == '-' ||
+        text == 'C' ||
+        text == '(' ||
+        text == ')') {
+      return Color.fromARGB(255, 252, 100, 100);
+    }
+    return Colors.white;
+  }
+
+  getBgColor(String text) {
+    if (text == 'AC') {
+      return Color.fromARGB(255, 252, 100, 100);
+    }
+    if (text == '=') {
+      return Color.fromARGB(255, 104, 204, 159);
+    }
+    return Color(0xff1d2630);
+  }
+
+  handleButtons(String text) {
+    if (text == "AC") {
+      userInput = "";
+      result = "0";
+      return;
+    }
+    if (text == "C") {
+      if (userInput.isNotEmpty) {
+        userInput = userInput.substring(0, userInput.length - 1);
+        return;
+      } else {
+        return null;
+      }
+    }
+    if (text == "=") {
+      result = calculate();
+      userInput = result;
+
+      if (userInput.endsWith('.0')) {
+        userInput = userInput.replaceAll('.0', '');
+      }
+      if (result.endsWith('.0')) {
+        result = result.replaceAll('.0', '');
+        return;
+      }
+    }
+    userInput = userInput + text;
+  }
+
+  String calculate() {
+    try {
+      var exp = Parser().parse(userInput);
+      var eval = exp.evaluate(EvaluationType.REAL, ContextModel());
+      return eval.toString();
+    } catch (e) {
+      return 'Error';
+    }
   }
 }
